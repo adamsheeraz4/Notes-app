@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Note
 from .serializers import NoteSerializer
+from .utils import updateNote, getNoteDetail, deleteNote, getNotesList, createNote
+
 
 #@api_view(['GET','PUT','POST','DELETE'])
 @api_view(['GET'])
@@ -43,20 +45,25 @@ def getRoutes(request):
 
     return Response(routes)
 
-@api_view(["GET"])
-def getNotes(request):
-    #notes consists of python objects
-    notes = Note.objects.all()
-    #serializes, turns python object to JSON, 
-    #the many arg means we want to serialize more than one object
-    serializer = NoteSerializer(notes, many=True)
-    return Response(serializer.data)
 
-@api_view(["GET"])
-def getNote(request,pk):
-    #notes consists of python objects
-    notes = Note.objects.get(id=pk)
-    #serializes, turns python object to JSON, 
-    #the many arg means we want to serialize more than one object
-    serializer = NoteSerializer(notes, many=False)
-    return Response(serializer.data)
+@api_view(['GET', 'POST'])
+def getNotes(request):
+
+    if request.method == 'GET':
+        return getNotesList(request)
+
+    if request.method == 'POST':
+        return createNote(request)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def getNote(request, pk):
+
+    if request.method == 'GET':
+        return getNoteDetail(request, pk)
+
+    if request.method == 'PUT':
+        return updateNote(request, pk)
+
+    if request.method == 'DELETE':
+        return deleteNote(request, pk)
